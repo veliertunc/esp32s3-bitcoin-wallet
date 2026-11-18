@@ -1,0 +1,62 @@
+menu "Bitcoin Wallet"
+
+    choice BTC_NETWORK
+        prompt "Bitcoin network"
+        default BTC_NETWORK_TESTNET
+        help
+            Start on testnet (testnet4) to try the wallet with worthless coins.
+            Switch to mainnet only after you have verified send/receive works.
+
+        config BTC_NETWORK_TESTNET
+            bool "Testnet4 (tb1..., coin type 1')"
+        config BTC_NETWORK_MAINNET
+            bool "Mainnet (bc1..., coin type 0')"
+    endchoice
+
+    config BTC_ESPLORA_URL
+        string "Esplora REST API base URL"
+        default "https://mempool.space/testnet4/api" if BTC_NETWORK_TESTNET
+        default "https://mempool.space/api" if BTC_NETWORK_MAINNET
+        help
+            Any Esplora-compatible API (mempool.space, blockstream.info, or your own
+            self-hosted mempool/electrs instance for better privacy).
+
+    config BTC_GAP_LIMIT
+        int "Address gap limit used when scanning"
+        range 3 40
+        default 10
+
+    config WALLET_KDF_ITERATIONS
+        int "PBKDF2-HMAC-SHA512 iterations for the SD-card wallet file"
+        range 5000 400000
+        default 50000
+        help
+            Higher = slower unlock but much harder to brute-force a stolen SD card.
+            50000 takes roughly 5-8 s on the ESP32-S3.
+
+    config WALLET_BIND_TO_DEVICE
+        bool "Bind the encrypted wallet file to this device"
+        default y
+        help
+            Mixes a random 32-byte secret stored in this board's NVS into the
+            encryption key. A stolen SD card alone then cannot be brute-forced,
+            but the file can only be opened on this board - your 24-word recovery
+            phrase is the only way to restore elsewhere. Enable NVS/flash
+            encryption for full protection of that secret.
+
+    config WALLET_AUTOLOCK_SECONDS
+        int "Auto-lock after inactivity (seconds, 0 = never)"
+        default 180
+
+    config WALLET_MAX_PIN_ATTEMPTS
+        int "Wrong-password attempts before an increasing delay is enforced"
+        default 3
+
+    config BOARD_TOUCH_MIRROR_X
+        bool "Mirror touch X axis"
+        default n
+    config BOARD_TOUCH_MIRROR_Y
+        bool "Mirror touch Y axis"
+        default n
+
+endmenu

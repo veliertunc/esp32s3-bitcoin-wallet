@@ -1,0 +1,9 @@
+build/
+managed_components/
+sdkconfig
+sdkconfig.old
+dependencies.lock
+*.log
+.cache/
+.vscode/
+ONX3248G035 Schematic_Diagram_V1.2.pdf
